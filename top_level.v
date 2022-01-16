@@ -1,6 +1,4 @@
 
-// This is the top-level module of the AES design and implementation on the FPGA. Through the instantiation
-// of data communications, AES encryption and AES decryption a stable design was achieved of the algorithm.
 
 module top_level(
 	// Input of the base system clock, connected to Terasic 50MHz clock.
@@ -55,13 +53,13 @@ wire dataDecryptedFlag;
 
 // FSM states
 reg[3:0] state;
-reg[3:0] IDLE 						= 4'd0;
+reg[3:0] IDLE 			= 4'd0;
 reg[3:0] NEXT_CYPHER_BLOCK 	= 4'd2;
-reg[3:0] EXTRACT_CONFIG_DATA  = 4'd4;
-reg[3:0] ENCRYPTION_IDLE		= 4'd5;
-reg[3:0] DECRYPTION_IDLE		= 4'd6;
-reg[3:0] FINISHED_ENCRYPTION  = 4'd8;
-reg[3:0] SEND_DATA 				= 4'd9;
+reg[3:0] EXTRACT_CONFIG_DATA    = 4'd4;
+reg[3:0] ENCRYPTION_IDLE	= 4'd5;
+reg[3:0] DECRYPTION_IDLE	= 4'd6;
+reg[3:0] FINISHED_ENCRYPTION    = 4'd8;
+reg[3:0] SEND_DATA 		= 4'd9;
 
 
 initial begin
@@ -87,57 +85,57 @@ end
 
 // Instantiation of the Data communication module.
 data_communication readAndWriteData(
-	.clock50MHz							(clock50MHz),		 // Pin connection passed down from top
-	.TXE									(TXE),				 // Pin connection passed down from top
-	.RXF									(RXF),				 // Pin connection passed down from top
-	.WR									(WR),					 // Pin connection passed down from top
-	.RD									(RD),					 // Pin connection passed down from top
+	.clock50MHz					(clock50MHz),		 	 // Pin connection passed down from top
+	.TXE						(TXE),				 // Pin connection passed down from top
+	.RXF						(RXF),				 // Pin connection passed down from top
+	.WR						(WR),				 // Pin connection passed down from top
+	.RD						(RD),				 // Pin connection passed down from top
 
-	.dataToSendFlag					(sendDataFlag),			 			// Input to data comms
-	.dataOut128Bits					(UARTDataOut),				 			// Input to data comms
-	.nextDataBlockFlag				(nextDataBlockFlag),					// Input to data comms
-	.encryptionFinishedFlag			(encryptionFinishedFlag),			// Input to data comms
+	.dataToSendFlag					(sendDataFlag),			// Input to data comms
+	.dataOut128Bits					(UARTDataOut),			// Input to data comms
+	.nextDataBlockFlag				(nextDataBlockFlag),		// Input to data comms
+	.encryptionFinishedFlag				(encryptionFinishedFlag),	// Input to data comms
 
-	.key									(receivedKey),			 				// Output from data comms
-	.dataIn128Bits						(receivedDataIn),				 		// Output from data comms
-	.configData128Bits				(receivedConfigData),		 		// Output from data comms
-	.receivedKeyFlag					(receivedKeyFlag),					// Output from data comms
-	.receivedDataFlag					(receivedDataInFlag),		 	   // Output from data comms
-	.receivedSendDataFlag			(dataCommsObtainedSendFlag),		// Output from data comms
-	.receivedConfigDataFlag			(configDataFlag),					   // Output from data comms
-	.receivedNextBlockFlag			(dataCommsObtainedNextBlockFlag),// Output from data comms
-	.receivedFinishedFlag			(dataCommsObtainedFinishedFlag), // Output from data comms
+	.key						(receivedKey),		        // Output from data comms
+	.dataIn128Bits					(receivedDataIn), 	 	// Output from data comms
+	.configData128Bits				(receivedConfigData),	        // Output from data comms
+	.receivedKeyFlag				(receivedKeyFlag),		// Output from data comms
+	.receivedDataFlag				(receivedDataInFlag),	        // Output from data comms
+	.receivedSendDataFlag				(dataCommsObtainedSendFlag),	// Output from data comms
+	.receivedConfigDataFlag				(configDataFlag),		// Output from data comms
+	.receivedNextBlockFlag				(dataCommsObtainedNextBlockFlag),// Output from data comms
+	.receivedFinishedFlag				(dataCommsObtainedFinishedFlag), // Output from data comms
 
 	.bit1									(bit1),				 // Pin connection passed down from top
-	.bit2									(bit2),				 // Pin connection passed down from top
-	.bit3									(bit3),				 // Pin connection passed down from top
-	.bit4									(bit4),				 // Pin connection passed down from top
-	.bit5									(bit5),				 // Pin connection passed down from top
-	.bit6									(bit6),				 // Pin connection passed down from top
-	.bit7									(bit7),				 // Pin connection passed down from top
-	.bit8									(bit8)				 // Pin connection passed down from top
+	.bit2									(bit2),				 
+	.bit3									(bit3),				
+	.bit4									(bit4),				
+	.bit5									(bit5),				 
+	.bit6									(bit6),				 
+	.bit7									(bit7),				 
+	.bit8									(bit8)				 
 );
 
 // Instantiation of the AES encryption module.
 encryption encryptAES(
-	.inputData				(encryptionDataIn),				// Input to encryption
-	.key						(encryptionkey),					// Input to encryption
-	.clock					(clock50MHz),						// Input to encryption
-	.inputsLoadedFlag		(encryptionInputsLoadedFlag),	// Input to encryption
-	.resetModule			(resetEncryptionModule),		// Input to encryption
+	.inputData				(encryptionDataIn),			// Input to encryption
+	.key						(encryptionkey),		// Input to encryption
+	.clock					(clock50MHz),				// Input to encryption
+	.inputsLoadedFlag		(encryptionInputsLoadedFlag),			// Input to encryption
+	.resetModule			(resetEncryptionModule),			// Input to encryption
 	.outputData				(encryptionDataOut), 			// Output from encryption
-	.dataEncryptedFlag	(dataEncryptedFlag)				// Output from encryption
+	.dataEncryptedFlag	(dataEncryptedFlag)					// Output from encryption
 );
 
 // Instantiation of the AES decryption module.
 decryption decryptAES(
-	.inputData				(decryptionDataIn),				// Input to decryption
-	.key						(decryptionkey),					// Input to decryption
-	.clock					(clock50MHz),						// Input to decryption
-	.inputsLoadedFlag		(decryptionInputsLoadedFlag),	// Input to decryption
-	.resetModule			(resetDecryptionModule),		// Input to decryption
-	.outputData				(decryptionDataOut),				// Output from decryption
-	.dataDecryptedFlag	(dataDecryptedFlag)				// Output from decryption
+	.inputData				(decryptionDataIn),			// Input to decryption
+	.key						(decryptionkey),		// Input to decryption
+	.clock					(clock50MHz),				// Input to decryption
+	.inputsLoadedFlag		(decryptionInputsLoadedFlag),			// Input to decryption
+	.resetModule			(resetDecryptionModule),			// Input to decryption
+	.outputData				(decryptionDataOut),			// Output from decryption
+	.dataDecryptedFlag	(dataDecryptedFlag)					// Output from decryption
 );
 
 
